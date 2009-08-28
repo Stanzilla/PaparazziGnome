@@ -2,6 +2,7 @@ local bosses = {}
 local addon = CreateFrame("Frame")
 local ssWhenOOC = nil
 local ss = nil
+local db = {}
 
 addon:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
 addon:RegisterEvent("PLAYER_LEVEL_UP")
@@ -10,6 +11,16 @@ addon:RegisterEvent("PLAYER_TARGET_CHANGED")
 addon:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 addon:RegisterEvent("PLAYER_REGEN_ENABLED")
 addon:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+addon:RegisterEvent("ADDON_LOADED")
+
+function addon:ADDON_LOADED(mod)
+	if mod ~= "PaparazziGnome" then return end
+	self:UnregisterEvent("ADDON_LOADED")
+	PaparazziGnomeDB = PaparazziGnomeDB or {}
+	local pName = UnitName("player")
+	PaparazziGnomeDB[pName] = PaparazziGnomeDB[pName] or {}
+	db = PaparazziGnomeDB[pName]
+end
 
 do
 	local total = 0
@@ -43,6 +54,10 @@ function addon:ACHIEVEMENT_EARNED() ss = true end
 
 function addon:COMBAT_LOG_EVENT_UNFILTERED(time, event, sGuid, sName, sFlags, dGuid, dName, dFlags)
 	if event ~= "UNIT_DIED" or not bosses[dGuid] then return end
+	-- Because of this, we no longer screenshot on new boss kills if the player is dead,
+	-- but I can't be arsed to add a "is raid in combat" scan right now.
+	if db[dGuid] or UnitIsDeadOrGhost("player") then return end
+	db[dGuid] = true
 	if InCombatLockdown() then
 		ssWhenOOC = true
 	else
