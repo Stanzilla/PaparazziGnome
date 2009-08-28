@@ -3,6 +3,7 @@
 ## Author: Rabbit
 ## Notes: Ich bein ein paparazzi.
 ## X-eMail: rabbit.magtheridon@gmail.com
+## SavedVariables: PaparazziGnomeDB
 
 snapthatshit.lua
 
