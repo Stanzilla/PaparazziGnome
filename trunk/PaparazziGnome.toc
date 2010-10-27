@@ -1,7 +1,7 @@
-## Interface: 30200
+## Interface: 40000
 ## Title: PaparazziGnome
 ## Author: Rabbit
-## Notes: Ich bein ein paparazzi.
+## Notes: Ich bin ein Paparazzi.
 ## X-eMail: rabbit.magtheridon@gmail.com
 ## SavedVariables: PaparazziGnomeDB
 

@@ -1,7 +1,6 @@
 local bosses = {}
 local addon = CreateFrame("Frame")
 local ssWhenOOC = nil
-local ss = nil
 local db = {}
 
 addon:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
@@ -22,29 +21,27 @@ function addon:ADDON_LOADED(mod)
 	db = PaparazziGnomeDB[pName]
 	for k in pairs(db) do
 		if type(k) == "string" then
-			local numericId = tonumber(k:sub(-12, -7), 16)
+			local numericId = tonumber(k:sub(7, 10), 16)
 			db[numericId] = true
 			db[k] = nil
 		end
 	end
 end
 
-do
-	local total = 0
-	local lastAutoSS = 0
-	addon:SetScript("OnUpdate", function(self, elapsed)
-		if not ss then return end
-		total = total + elapsed
-		if total > 1.25 then
-			local t = GetTime()
-			if t > (lastAutoSS + 120) then
-				Screenshot()
-				lastAutoSS = t
-			end
-			ss = nil
-			total = 0
+
+local total = 0
+local lastAutoSS = 0
+local function snapthatshit(self, elapsed)
+	total = total + elapsed
+	if total > 1.25 then
+		local t = GetTime()
+		if t > (lastAutoSS + 120) then
+			Screenshot()
+			lastAutoSS = t
 		end
-	end)
+		total = 0
+		self:SetScript("OnUpdate", nil)
+	end
 end
 
 local function targetCheck(unit)
@@ -56,12 +53,12 @@ local function targetCheck(unit)
 end
 function addon:UPDATE_MOUSEOVER_UNIT() targetCheck("mouseover") end
 function addon:PLAYER_TARGET_CHANGED() targetCheck("target") end
-function addon:PLAYER_LEVEL_UP() ss = true end
-function addon:ACHIEVEMENT_EARNED() ss = true end
+function addon:PLAYER_LEVEL_UP() self:SetScript("OnUpdate", snapthatshit) end
+function addon:ACHIEVEMENT_EARNED() self:SetScript("OnUpdate", snapthatshit) end
 
 function addon:COMBAT_LOG_EVENT_UNFILTERED(time, event, sGuid, sName, sFlags, dGuid, dName, dFlags)
 	if event ~= "UNIT_DIED" or UnitIsDeadOrGhost("player") or not bosses[dGuid] then return end
-	local numericId = tonumber(dGuid:sub(-12, -7), 16)
+	local numericId = tonumber(dGuid:sub(7, 10), 16)
 	-- Because of this, we no longer screenshot on new boss kills if the player is dead,
 	-- but I can't be arsed to add a "is raid in combat" scan right now.
 	if db[numericId] then return end
@@ -69,13 +66,13 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED(time, event, sGuid, sName, sFlags, dG
 	if InCombatLockdown() then
 		ssWhenOOC = true
 	else
-		ss = true
+		self:SetScript("OnUpdate", snapthatshit)
 	end
 end
 
 function addon:PLAYER_REGEN_ENABLED()
 	if ssWhenOOC then
-		ss = true
+		self:SetScript("OnUpdate", snapthatshit)
 		ssWhenOOC = nil
 	end
 end
