@@ -56,7 +56,7 @@ function addon:PLAYER_TARGET_CHANGED() targetCheck("target") end
 function addon:PLAYER_LEVEL_UP() self:SetScript("OnUpdate", snapthatshit) end
 function addon:ACHIEVEMENT_EARNED() self:SetScript("OnUpdate", snapthatshit) end
 
-function addon:COMBAT_LOG_EVENT_UNFILTERED(time, event, sGuid, sName, sFlags, dGuid, dName, dFlags)
+function addon:COMBAT_LOG_EVENT_UNFILTERED(time, event, _, sGuid, sName, sFlags, dGuid, dName, dFlags)
 	if event ~= "UNIT_DIED" or UnitIsDeadOrGhost("player") or not bosses[dGuid] then return end
 	local numericId = tonumber(dGuid:sub(7, 10), 16)
 	-- Because of this, we no longer screenshot on new boss kills if the player is dead,
