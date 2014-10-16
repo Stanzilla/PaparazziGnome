@@ -58,7 +58,8 @@ function addon:ACHIEVEMENT_EARNED() self:SetScript("OnUpdate", snapthatshit) end
 
 function addon:COMBAT_LOG_EVENT_UNFILTERED(_, event, _, _, _, _, _, dGuid)
 	if event ~= "UNIT_DIED" or UnitIsDeadOrGhost("player") or not bosses[dGuid] then return end
-	local numericId = tonumber(dGuid:sub(7, 10), 16)
+	local type, _, _, _, _, cid = strsplit("-", dguid or "")
+	local numericId = type and (type == "Creature" or type == "Vehicle" or type == "Pet") and tonumber(cid) or 0
 	-- Because of this, we no longer screenshot on new boss kills if the player is dead,
 	-- but I can't be arsed to add a "is raid in combat" scan right now.
 	if db[numericId] then return end
