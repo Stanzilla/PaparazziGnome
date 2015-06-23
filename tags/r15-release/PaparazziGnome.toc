@@ -1,0 +1,9 @@
+## Interface: 60200
+## Title: PaparazziGnome
+## Author: Rabbit
+## Notes: Ich bin ein Paparazzi.
+## X-eMail: rabbit.magtheridon@gmail.com
+## SavedVariables: PaparazziGnomeDB
+
+snapthatshit.lua
+
